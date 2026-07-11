@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <title>TERMINAL://ACCESS_GATE</title>
+    <style>
+        body {
+            background-color: #000;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 40px;
+            font-size: 16px;
+            line-height: 1.5;
+        }
+        .console-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            width: 300px;
+            outline: none;
+        }
+        .error { color: #ff0000; }
+        .success { color: #00ff00; }
+        pre { font-family: 'Courier New', Courier, monospace; }
+    </style>
+</head>
+<body>
+    <div id="terminal">
+        <pre>
+===================================================================
+                  СИСТЕМА АУТЕНТИФИКАЦИИ УРОВНЯ 2
+===================================================================
+STATUS: ОЖИДАНИЕ КЛЮЧЕЙ АКТИВАЦИИ...
+ИНСТРУКЦИЯ: Введите команду 'login ' и ваш 24-битный ключ (Base2).
+-------------------------------------------------------------------
+        </pre>
+        <div id="history"></div>
+        <p>system@terminal:~$ <input type="text" id="command" class="console-input" autofocus></p>
+    </div>
+
+    <script>
+        // Твоя база данных переведенных кодов (BASE_10 -> BASE_2)
+        // Впиши сюда РЕАЛЬНЫЕ двоичные коды своих 4 игроков!
+        const PLAYER_DATA = {
+            "11001001": "ДОСТУП РАЗРЕШЕН. [ИГРОК 1]: ЧАСТЬ ОБЩЕЙ СХЕМЫ: Вершина графа A соединяется с B (вес 12), с C (вес 4). Ограничение: узел B заблокирован.",
+            "10101010": "ДОСТУП РАЗРЕШЕН. [ИГРОК 2]: ЧАСТЬ ОБЩЕЙ СХЕМЫ: Вершина графа C соединяется с D (вес 3), с E (вес 8). Ограничение: ребро C-E нестабильно.",
+            "11110000": "ДОСТУП РАЗРЕШЕН. [ИГРОК 3]: ЧАСТЬ ОБЩЕЙ СХЕМЫ: Вершина графа D соединяется с Z (вес 5). Вершина E соединяется с Z (вес 2).",
+            "00001111": "ДОСТУП РАЗРЕШЕН. [ИГРОК 4]: КРИТИЧЕСКОЕ УСЛОВИЕ: Целевая вершина — Z. Вычислить кратчайший стабильный путь от А до Z. Ответ — это пароль."
+        };
+
+        const input = document.getElementById('command');
+        const history = document.getElementById('history');
+
+        input.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                const rawText = input.value.trim();
+                input.value = '';
+                
+                if (!rawText) return;
+
+                // Выводим то, что ввел пользователь
+                history.innerHTML += `<div>system@terminal:~$ ${rawText}</div>`;
+
+                const parts = rawText.split(' ');
+                const command = parts[0].toLowerCase();
+                const argument = parts[1];
+
+                if (command === 'login') {
+                    if (PLAYER_DATA[argument]) {
+                        history.innerHTML += `<div class="success">[SUCCESS] ${PLAYER_DATA[argument]}</div><br>`;
+                    } else {
+                        history.innerHTML += `<div class="error">[ERROR] ОШИБКА АУТЕНТИФИКАЦИИ. Ключ не найден в реестре ядра.</div><br>`;
+                    }
+                } else if (command === 'clear') {
+                    history.innerHTML = '';
+                } else if (command === 'help') {
+                    history.innerHTML += `<div>Доступные команды: login [код], clear, help</div><br>`;
+                } else {
+                    history.innerHTML += `<div class="error">[UNKNOWN COMMAND] Команда '${command}' не распознана. Введите 'help' для справки.</div><br>`;
+                }
+
+                window.scrollTo(0, document.body.scrollHeight);
+            }
+        });
+    </script>
+</body>
+</html>
